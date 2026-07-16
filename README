@@ -1,0 +1,39 @@
+meta-iot-gateway-hardened
+=========================
+
+TP Securite (M2 SI, ESGI) - Groupe 9.
+Image Linux durcie pour une passerelle IoT. Yocto Scarthgap 5.0, cible qemux86-64.
+
+Durcissement :
+- root verrouille (usermod -L) + PermitRootLogin no
+- utilisateur admin non-root (groupe sudo)
+- rootfs en lecture seule
+- flags de durcissement du compilateur (security_flags.inc)
+- pare-feu iptables : entrant bloque sauf ssh et loopback
+- analyse de CVE (cve-check)
+
+Integration (depuis la racine de poky, branche scarthgap) :
+
+    git clone -b scarthgap git://git.openembedded.org/meta-openembedded
+    git clone -b scarthgap git://git.yoctoproject.org/meta-security
+
+    bitbake-layers add-layer ../meta-openembedded/meta-oe
+    bitbake-layers add-layer ../meta-openembedded/meta-python
+    bitbake-layers add-layer ../meta-openembedded/meta-perl
+    bitbake-layers add-layer ../meta-security
+    bitbake-layers add-layer ../meta-iot-gateway-hardened
+
+Dans conf/local.conf :
+
+    require conf/distro/include/security_flags.inc
+    INHERIT += "cve-check"
+
+Build :
+
+    bitbake iot-gateway-image
+
+Test sous QEMU (runqemu qemux86-64) :
+- ssh root@<ip>  -> refuse
+- ssh admin@<ip> (mot de passe admin) -> ok, mais ecriture sur / refusee
+- iptables -L -n
+- rapport CVE dans tmp/deploy/cve/

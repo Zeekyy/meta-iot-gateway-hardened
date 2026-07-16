@@ -1,0 +1,8 @@
+PermitRootLogin no
+PasswordAuthentication yes
+PubkeyAuthentication no
+PermitEmptyPasswords no
+X11Forwarding no
+AllowTcpForwarding no
+MaxAuthTries 3
+LogLevel VERBOSE
